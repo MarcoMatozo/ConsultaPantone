@@ -1,0 +1,68 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Consulta Pantone";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Consulta de Cores Pantone</h1>
+
+    <form method="get" class="mt-4 mb-4">
+        <div class="input-group mb-3">
+            <input type="text" asp-for="TermoBusca" class="form-control" placeholder="Digite o código TPX ou Nome da cor...">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+    </form>
+
+    <style>
+        .amostra-cor {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+
+        .card-pantone {
+            transition: transform .2s;
+        }
+
+            .card-pantone:hover {
+                transform: scale(1.02);
+                background-color: #f8f9fa !important;
+            }
+    </style>
+
+    <div class="container mt-4">
+        <p class="text-muted">Foram encontrados @Model.Resultados.Count cores para a sua busca.</p>
+        <table class="table align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Código TPX</th>
+                    <th>Nome da Cor</th>
+                    <th>Localização (Pág/Col/Lin)</th>
+                    <th>Amostra</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Resultados)
+                {
+                    <tr class="card-pantone">
+                        <td><strong>@item.PantoneTpx</strong></td>
+                        <td>@item.NomePantone</td>
+                        <td>Pág: @item.Pagina2 | Col: @item.Coluna2 | Lin: @item.Linha2</td>
+                        <td>
+                            <div class="amostra-cor" style="background-color: rgb(@item.Red, @item.Green, @item.Blue);"></div>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="alert('Valores Técnicos:\nCorCo: @item.CorCo\nCorCv: @item.CorCv\nCorPa: @item.CorPa')">
+                                Ver Detalhes
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
