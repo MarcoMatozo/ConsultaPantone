@@ -1,68 +1,322 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Consulta Pantone";
+    ViewData["Title"] = "Pantone Lab Pro";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Consulta de Cores Pantone</h1>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <form method="get" class="mt-4 mb-4">
-        <div class="input-group mb-3">
-            <input type="text" asp-for="TermoBusca" class="form-control" placeholder="Digite o código TPX ou Nome da cor...">
-            <button class="btn btn-primary" type="submit">Buscar</button>
+<style>
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Cabeçalho Profissional */
+    .header-section {
+        background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Cards e Containers */
+    .custom-card {
+        background: white;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        padding: 1.2rem;
+    }
+
+    /* Amostra de Cor Circular */
+    .color-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        display: inline-block;
+    }
+
+    /* Badge de Verificado */
+    .badge-verified {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        padding: 4px 8px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid #badbcc;
+    }
+
+    .btn-action {
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+            filter: brightness(90%);
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f0f7ff;
+    }
+</style>
+
+<div class="header-section">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h3 fw-bold mb-0"><i class="bi bi-alembic"></i> Pantone Lab Pro</h1>
+            <p class="small opacity-75 mb-0">Laboratório de Pesagem e Misturas</p>
         </div>
-    </form>
-
-    <style>
-        .amostra-cor {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            display: inline-block;
-        }
-
-        .card-pantone {
-            transition: transform .2s;
-        }
-
-            .card-pantone:hover {
-                transform: scale(1.02);
-                background-color: #f8f9fa !important;
-            }
-    </style>
-
-    <div class="container mt-4">
-        <p class="text-muted">Foram encontrados @Model.Resultados.Count cores para a sua busca.</p>
-        <table class="table align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Código TPX</th>
-                    <th>Nome da Cor</th>
-                    <th>Localização (Pág/Col/Lin)</th>
-                    <th>Amostra</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Resultados)
-                {
-                    <tr class="card-pantone">
-                        <td><strong>@item.PantoneTpx</strong></td>
-                        <td>@item.NomePantone</td>
-                        <td>Pág: @item.Pagina2 | Col: @item.Coluna2 | Lin: @item.Linha2</td>
-                        <td>
-                            <div class="amostra-cor" style="background-color: rgb(@item.Red, @item.Green, @item.Blue);"></div>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="alert('Valores Técnicos:\nCorCo: @item.CorCo\nCorCv: @item.CorCv\nCorPa: @item.CorPa')">
-                                Ver Detalhes
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="d-flex gap-2">
+            <a href="/Bancada" class="btn btn-outline-light btn-action position-relative me-2">
+                <i class="bi bi-briefcase"></i> Bancada
+                <span id="contadorMenu" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm">0</span>
+            </a>
+            <button class="btn btn-success btn-action shadow-sm text-white" data-bs-toggle="offcanvas" data-bs-target="#painelDetalhes" onclick="limparForm()">
+                <i class="bi bi-plus-lg"></i> Novo Pantone
+            </button>
+        </div>
     </div>
+</div>
+
+<div class="container">
+    <div class="custom-card mb-4 border-start border-primary border-4">
+        <form method="get">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="campoBusca" asp-for="TermoBusca" class="form-control border-start-0 ps-0" placeholder="Pesquise por Código ou Nome do Pantone...">
+                <button class="btn btn-primary px-5" type="submit">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="custom-card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-center mb-0">
+                <thead class="text-muted small text-uppercase fw-bold border-bottom">
+                    <tr>
+                        <th class="text-start">Identificação</th>
+                        <th>Pág/Col/Lin</th>
+                        <th>Amostra</th>
+                        <th>CorCo</th>
+                        <th>CorPa</th>
+                        <th>CorPes</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Resultados)
+                    {
+                        <tr>
+                            <td class="text-start">
+                                <div class="fw-bold text-dark">@item.PantoneTpx</div>
+                                <div class="small text-muted">@item.NomePantone</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border">P @item.Pagina2 / C @item.Coluna2 / L @item.Linha2</span>
+                            </td>
+                            <td>
+                                <div class="color-circle" style="background-color: rgb(@item.Red, @item.Green, @item.Blue);"></div>
+                            </td>
+                            <td>
+                                @if (item.Verificada)
+                                {
+                                    <span class="badge-verified"><i class="bi bi-check-circle-fill"></i> @item.CorCo</span>
+                                }
+                                else
+                                {
+
+                                    <span class="text-dark">@item.CorCo</span>
+                                }
+                            </td>
+                            <td>@item.CorPa</td>
+                            <td>
+                                @if (item.Verificadapes)
+                                {
+                                    <span class="badge-verified"><i class="bi bi-check-circle-fill"></i> @item.CorPes</span>
+                                }
+                                else
+                                {
+
+                                    <span class="text-dark">@item.CorPes</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary btn-action" title="Ficha Técnica"
+                                            data-bs-toggle="offcanvas" data-bs-target="#painelDetalhes"
+                                            onclick="preencherDetalhes('@item.NomePantone', '@item.PantoneTpx', '@item.Pagina2', '@item.Coluna2', '@item.Linha2', '@item.CorCo', '@item.CorCoAlt', '@item.CorPa', '@item.CorCv', '@item.CorPes', '@item.CorPoli', @item.Red, @item.Green, @item.Blue, '@item.Verificada', '@item.Verificadapes')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning btn-action" title="Adicionar à Bancada"
+                                            onclick="adicionarAosFavoritos('@item.PantoneTpx', '@item.NomePantone', '@item.CorCo', '@item.CorPa', '@item.CorPes', @item.Red, @item.Green, @item.Blue)">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="painelDetalhes" style="width: 450px;">
+    <div class="offcanvas-header bg-dark text-white p-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-gear-fill me-2"></i>Ficha Técnica</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-4">
+        <form asp-page-handler="Salvar" method="post">
+            <div id="visualCor" class="mb-4" style="height: 100px; border-radius: 12px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">CÓDIGO TPX</label>
+                    <input type="text" name="PantoneTpx" id="editCodigo" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">NOME</label>
+                    <input type="text" name="NomePantone" id="editNome" class="form-control">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4 text-center">
+                <div class="col-4"><label class="small text-muted">PÁG</label><input type="text" name="Pagina2" id="editPagina" class="form-control text-center"></div>
+                <div class="col-4"><label class="small text-muted">COL</label><input type="text" name="Coluna2" id="editColuna" class="form-control text-center"></div>
+                <div class="col-4"><label class="small text-muted">LIN</label><input type="text" name="Linha2" id="editLinha" class="form-control text-center"></div>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 mb-4">
+                <h6 class="fw-bold mb-3 text-primary small text-uppercase">Concentrações e Fórmulas</h6>
+                <div class="row g-2">
+                    <div class="col-4"><label class="x-small fw-bold">CorCo</label><input type="number" name="CorCo" id="editCo" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="x-small fw-bold">Alt</label><input type="number" name="CorCoAlt" id="editAlt" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="x-small fw-bold">CorPa</label><input type="number" name="CorPa" id="editPa" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="x-small fw-bold">CorCv</label><input type="number" name="CorCv" id="editCv" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="x-small fw-bold">CorPes</label><input type="number" name="CorPes" id="editPes" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="x-small fw-bold">Poli</label><input type="number" name="CorPoli" id="editPoli" class="form-control form-control-sm" step="any"></div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" name="Verificada" id="editVerificada" value="true">
+                    <label class="form-check-label small fw-bold text-success">CorCo Verificada</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="Verificadapes" id="editVerificadapes" value="true">
+                    <label class="form-check-label small fw-bold text-success">CorPes Verificada</label>
+                </div>
+            </div>
+
+            <div class="border p-3 rounded-3 bg-light mb-4">
+                <label class="form-label small fw-bold d-block text-center mb-2">AJUSTE VISUAL RGB</label>
+                <input type="color" id="colorPicker" class="form-control form-control-color w-100 mb-3 shadow-sm">
+                <div class="row g-2 text-center">
+                    <div class="col-4"><label class="x-small d-block text-muted">R</label><input type="number" name="Red" id="editRed" class="form-control form-control-sm text-center" readonly></div>
+                    <div class="col-4"><label class="x-small d-block text-muted">G</label><input type="number" name="Green" id="editGreen" class="form-control form-control-sm text-center" readonly></div>
+                    <div class="col-4"><label class="x-small d-block text-muted">B</label><input type="number" name="Blue" id="editBlue" class="form-control form-control-sm text-center" readonly></div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg shadow">Salvar Alterações</button>
+                <button type="submit" asp-page-handler="Excluir" id="btnExcluir" class="btn btn-link text-danger btn-sm text-decoration-none" onclick="return confirm('Deseja excluir permanentemente este registro?')">Excluir este Pantone</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Memória local para a Bancada (Favoritos)
+        let favoritos = JSON.parse(localStorage.getItem('favoritosPantone')) || [];
+
+        // Ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarContadorMenu();
+
+            // Lógica do Seletor de Cores
+            const picker = document.getElementById('colorPicker');
+            if(picker) {
+                picker.addEventListener('input', function() {
+                    const hex = this.value;
+                    document.getElementById('editRed').value = parseInt(hex.substr(1, 2), 16);
+                    document.getElementById('editGreen').value = parseInt(hex.substr(3, 2), 16);
+                    document.getElementById('editBlue').value = parseInt(hex.substr(5, 2), 16);
+                    document.getElementById('visualCor').style.backgroundColor = hex;
+                });
+            }
+        });
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (parseInt(r) << 16) + (parseInt(g) << 8) + parseInt(b)).toString(16).slice(1);
+        }
+
+        // Funções da Bancada
+        function adicionarAosFavoritos(cod, nome, co, pa, pes, r, g, b) {
+            if (favoritos.some(f => f.cod === cod)) {
+                alert("Este item já está na sua bancada!");
+                return;
+            }
+            favoritos.push({ cod, nome, co, pa, pes, r, g, b });
+            localStorage.setItem('favoritosPantone', JSON.stringify(favoritos));
+            atualizarContadorMenu();
+            alert("Cor adicionada à Bancada!");
+        }
+
+        function atualizarContadorMenu() {
+            const contador = document.getElementById('contadorMenu');
+            if(contador) contador.innerText = favoritos.length;
+        }
+
+        // Funções do Formulário de Edição
+        function preencherDetalhes(nome, cod, p, c, l, co, alt, pa, cv, pes, poli, r, g, b, ver, verpes) {
+            document.getElementById('editNome').value = nome;
+            document.getElementById('editCodigo').value = cod;
+            document.getElementById('editCodigo').readOnly = true;
+            document.getElementById('editPagina').value = p;
+            document.getElementById('editColuna').value = c;
+            document.getElementById('editLinha').value = l;
+            document.getElementById('editCo').value = co;
+            document.getElementById('editAlt').value = alt;
+            document.getElementById('editPa').value = pa;
+            document.getElementById('editCv').value = cv;
+            document.getElementById('editPes').value = pes;
+            document.getElementById('editPoli').value = poli;
+
+            document.getElementById('editRed').value = r;
+            document.getElementById('editGreen').value = g;
+            document.getElementById('editBlue').value = b;
+
+            document.getElementById('editVerificada').checked = (ver === 'True');
+            document.getElementById('editVerificadapes').checked = (verpes === 'True');
+
+            const hex = rgbToHex(r, g, b);
+            document.getElementById('visualCor').style.backgroundColor = hex;
+            document.getElementById('colorPicker').value = hex;
+
+            document.getElementById('btnExcluir').formAction = "/Index?handler=Excluir&id=" + cod;
+            document.getElementById('btnExcluir').style.display = "block";
+        }
+
+        function limparForm() {
+            const ids = ['editNome', 'editCodigo', 'editPagina', 'editColuna', 'editLinha', 'editCo', 'editAlt', 'editPa', 'editCv', 'editPes', 'editPoli', 'editRed', 'editGreen', 'editBlue'];
+            ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+            document.getElementById('editCodigo').readOnly = false;
+            document.getElementById('editVerificada').checked = false;
+            document.getElementById('editVerificadapes').checked = false;
+            document.getElementById('visualCor').style.backgroundColor = "#fff";
+            document.getElementById('colorPicker').value = "#ffffff";
+            document.getElementById('btnExcluir').style.display = "none";
+        }
+    </script>
+}

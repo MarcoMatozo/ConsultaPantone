@@ -16,5 +16,7 @@
         public int Red { get; set; }
         public int Green { get; set; }
         public int Blue { get; set; }
+        public bool Verificada { get; set; } // Campo Sim/Não do Access
+        public bool Verificadapes { get; set; } // Campo Sim/Não do Access
     }
 }
