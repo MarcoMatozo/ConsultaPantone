@@ -34,12 +34,63 @@
         color: #0d6efd;
         font-size: 0.85rem;
     }
+
+    /* CONFIGURAÇÃO DE IMPRESSÃO */
+    @@media print {
+        .no-print, .btn, .header-bancada, .remover-col, .form-check-input {
+            display: none !important;
+        }
+
+        body {
+            background-color: white !important;
+        }
+
+        .card-cliente {
+            border: 1px solid #eee !important;
+            box-shadow: none !important;
+            margin-bottom: 20px !important;
+        }
+
+        .table {
+            width: 100% !important;
+            border: 1px solid #000 !important;
+        }
+
+        th {
+            background-color: #f8f9fa !important;
+            color: black !important;
+        }
+
+        .val-tecnico {
+            color: black !important;
+        }
+
+        .print-only {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    }
+
+    .print-only {
+        display: none;
+    }
 </style>
 
-<div class="header-bancada">
+<div class="print-only">
+    <h3>LABORATÓRIO - RELATÓRIO DE ENVIO</h3>
+    <hr>
+</div>
+
+<div class="header-bancada no-print">
     <div class="container d-flex justify-content-between align-items-center">
         <h2 class="mb-0 fw-bold"><i class="bi bi-send-check"></i> Registro de Envio</h2>
-        <a href="/Index" class="btn btn-outline-light btn-sm">Voltar</a>
+        <div>
+            <button type="button" onclick="window.print()" class="btn btn-warning btn-sm me-2">
+                <i class="bi bi-printer"></i> Imprimir Relatório
+            </button>
+            <a href="/Index" class="btn btn-outline-light btn-sm">Voltar</a>
+        </div>
     </div>
 </div>
 
@@ -56,15 +107,15 @@
                     <input type="text" asp-for="Nomecliente" id="nomeDisplay" class="form-control form-control-lg bg-light" readonly>
                     <span id="msgErro" class="text-danger small fw-bold" style="display:none;">Cliente não localizado!</span>
                 </div>
-                <div class="col-md-3 text-end">
-                    <button type="button" onclick="confirmar()" class="btn btn-success btn-lg w-100 shadow">Salvar Envio</button>
+                <div class="col-md-3 text-end no-print">
+                    <button type="button" onclick="confirmar()" class="btn btn-success btn-lg w-100 shadow">Salvar no Banco</button>
                 </div>
             </div>
             <input type="hidden" name="DadosJson" id="DadosJson">
         </form>
     </div>
 
-    <div class="bg-white p-0 rounded shadow-sm overflow-hidden">
+    <div class="bg-white p-0 rounded shadow-sm overflow-hidden border">
         <table class="table table-hover align-middle text-center mb-0">
             <thead class="table-light">
                 <tr>
@@ -74,11 +125,24 @@
                     <th>CorPA</th>
                     <th>CorPoli</th>
                     <th>Alt</th>
-                    <th>Remover</th>
+                    <th class="no-print remover-col">Remover</th>
                 </tr>
             </thead>
             <tbody id="corpoTabela"></tbody>
         </table>
+    </div>
+
+    <div class="print-only mt-5 pt-5">
+        <div class="row">
+            <div class="col-6 text-center">
+                <hr style="width: 80%; margin: 0 auto;">
+                <p>Assinatura Responsável</p>
+            </div>
+            <div class="col-6 text-center">
+                <hr style="width: 80%; margin: 0 auto;">
+                <p>Data do Envio</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -93,12 +157,12 @@
             t.innerHTML = itens.map((item, i) => `
                 <tr>
                     <td class="text-start ps-4"><b>${item.cod}</b><br><small class="text-muted">${item.nome || ''}</small></td>
-                    <td><span class="val-tecnico">${item.co || '0'}</span><input type="checkbox" class="form-check-input" data-idx="${i}" data-campo="co" checked></td>
-                    <td><span class="val-tecnico">${item.pes || '0'}</span><input type="checkbox" class="form-check-input" data-idx="${i}" data-campo="pes"></td>
-                    <td><span class="val-tecnico">${item.pa || '0'}</span><input type="checkbox" class="form-check-input" data-idx="${i}" data-campo="pa"></td>
-                    <td><span class="val-tecnico">${item.poli || '0'}</span><input type="checkbox" class="form-check-input" data-idx="${i}" data-campo="poli"></td>
-                    <td><span class="val-tecnico">${item.alt || '0'}</span><input type="checkbox" class="form-check-input" data-idx="${i}" data-campo="alt"></td>
-                    <td><button onclick="remover(${i})" class="btn btn-sm text-danger border-0"><i class="bi bi-trash"></i></button></td>
+                    <td><span class="val-tecnico">${item.co || '0'}</span><input type="checkbox" class="form-check-input no-print" data-idx="${i}" data-campo="co" checked></td>
+                    <td><span class="val-tecnico">${item.pes || '0'}</span><input type="checkbox" class="form-check-input no-print" data-idx="${i}" data-campo="pes"></td>
+                    <td><span class="val-tecnico">${item.pa || '0'}</span><input type="checkbox" class="form-check-input no-print" data-idx="${i}" data-campo="pa"></td>
+                    <td><span class="val-tecnico">${item.poli || '0'}</span><input type="checkbox" class="form-check-input no-print" data-idx="${i}" data-campo="poli"></td>
+                    <td><span class="val-tecnico">${item.alt || '0'}</span><input type="checkbox" class="form-check-input no-print" data-idx="${i}" data-campo="alt"></td>
+                    <td class="no-print remover-col"><button onclick="remover(${i})" class="btn btn-sm text-danger border-0"><i class="bi bi-trash"></i></button></td>
                 </tr>
             `).join('');
         }
