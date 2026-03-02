@@ -9,10 +9,9 @@
 <style>
     body {
         background-color: #f4f7f6;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Cabeçalho Profissional */
     .header-section {
         background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
         color: white;
@@ -22,7 +21,6 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    /* Cards e Containers */
     .custom-card {
         background: white;
         border: none;
@@ -31,7 +29,6 @@
         padding: 1.2rem;
     }
 
-    /* Amostra de Cor Circular */
     .color-circle {
         width: 32px;
         height: 32px;
@@ -41,7 +38,6 @@
         display: inline-block;
     }
 
-    /* Badge de Verificado */
     .badge-verified {
         background-color: #d1e7dd;
         color: #0f5132;
@@ -74,6 +70,7 @@
             <p class="small opacity-75 mb-0">Laboratório de Pesagem e Misturas</p>
         </div>
         <div class="d-flex gap-2">
+            <a href="/Historico" class="btn btn-outline-info text-white me-2 shadow-sm"><i class="bi bi-clock-history"></i> Histórico</a>
             <a href="/Bancada" class="btn btn-outline-light btn-action position-relative me-2">
                 <i class="bi bi-briefcase"></i> Bancada
                 <span id="contadorMenu" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm">0</span>
@@ -86,7 +83,12 @@
 </div>
 
 <div class="container">
-    <div class="custom-card mb-4 border-start border-primary border-4">
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger shadow-sm border-0 mb-4">@TempData["Erro"]</div>
+    }
+
+    <div class="custom-card mb-4 border-start border-primary border-4 shadow-sm">
         <form method="get">
             <div class="input-group input-group-lg">
                 <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
@@ -131,7 +133,6 @@
                                 }
                                 else
                                 {
-
                                     <span class="text-dark">@item.CorCo</span>
                                 }
                             </td>
@@ -143,18 +144,16 @@
                                 }
                                 else
                                 {
-
                                     <span class="text-dark">@item.CorPes</span>
                                 }
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <button class="btn btn-sm btn-outline-primary btn-action" title="Ficha Técnica"
-                                            data-bs-toggle="offcanvas" data-bs-target="#painelDetalhes"
+                                    <button class="btn btn-sm btn-outline-primary btn-action"
                                             onclick="preencherDetalhes('@item.NomePantone', '@item.PantoneTpx', '@item.Pagina2', '@item.Coluna2', '@item.Linha2', '@item.CorCo', '@item.CorCoAlt', '@item.CorPa', '@item.CorCv', '@item.CorPes', '@item.CorPoli', @item.Red, @item.Green, @item.Blue, '@item.Verificada', '@item.Verificadapes')">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-warning btn-action" title="Adicionar à Bancada"
+                                    <button class="btn btn-sm btn-outline-warning btn-action"
                                             onclick="adicionarAosFavoritos('@item.PantoneTpx', '@item.NomePantone', '@item.CorCo', '@item.CorPa', '@item.CorPes', @item.Red, @item.Green, @item.Blue)">
                                         <i class="bi bi-star"></i>
                                     </button>
@@ -197,12 +196,12 @@
             <div class="bg-light p-3 rounded-3 mb-4">
                 <h6 class="fw-bold mb-3 text-primary small text-uppercase">Concentrações e Fórmulas</h6>
                 <div class="row g-2">
-                    <div class="col-4"><label class="x-small fw-bold">CorCo</label><input type="number" name="CorCo" id="editCo" class="form-control form-control-sm" step="any"></div>
-                    <div class="col-4"><label class="x-small fw-bold">Alt</label><input type="number" name="CorCoAlt" id="editAlt" class="form-control form-control-sm" step="any"></div>
-                    <div class="col-4"><label class="x-small fw-bold">CorPa</label><input type="number" name="CorPa" id="editPa" class="form-control form-control-sm" step="any"></div>
-                    <div class="col-4"><label class="x-small fw-bold">CorCv</label><input type="number" name="CorCv" id="editCv" class="form-control form-control-sm" step="any"></div>
-                    <div class="col-4"><label class="x-small fw-bold">CorPes</label><input type="number" name="CorPes" id="editPes" class="form-control form-control-sm" step="any"></div>
-                    <div class="col-4"><label class="x-small fw-bold">Poli</label><input type="number" name="CorPoli" id="editPoli" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="small fw-bold">CorCo</label><input type="number" name="CorCo" id="editCo" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="small fw-bold">Alt</label><input type="number" name="CorCoAlt" id="editAlt" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="small fw-bold">CorPa</label><input type="number" name="CorPa" id="editPa" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="small fw-bold">CorCv</label><input type="number" name="CorCv" id="editCv" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="small fw-bold">CorPes</label><input type="number" name="CorPes" id="editPes" class="form-control form-control-sm" step="any"></div>
+                    <div class="col-4"><label class="small fw-bold">Poli</label><input type="number" name="CorPoli" id="editPoli" class="form-control form-control-sm" step="any"></div>
                 </div>
             </div>
 
@@ -221,15 +220,15 @@
                 <label class="form-label small fw-bold d-block text-center mb-2">AJUSTE VISUAL RGB</label>
                 <input type="color" id="colorPicker" class="form-control form-control-color w-100 mb-3 shadow-sm">
                 <div class="row g-2 text-center">
-                    <div class="col-4"><label class="x-small d-block text-muted">R</label><input type="number" name="Red" id="editRed" class="form-control form-control-sm text-center" readonly></div>
-                    <div class="col-4"><label class="x-small d-block text-muted">G</label><input type="number" name="Green" id="editGreen" class="form-control form-control-sm text-center" readonly></div>
-                    <div class="col-4"><label class="x-small d-block text-muted">B</label><input type="number" name="Blue" id="editBlue" class="form-control form-control-sm text-center" readonly></div>
+                    <div class="col-4"><label class="small d-block text-muted">R</label><input type="number" name="Red" id="editRed" class="form-control form-control-sm text-center" readonly></div>
+                    <div class="col-4"><label class="small d-block text-muted">G</label><input type="number" name="Green" id="editGreen" class="form-control form-control-sm text-center" readonly></div>
+                    <div class="col-4"><label class="small d-block text-muted">B</label><input type="number" name="Blue" id="editBlue" class="form-control form-control-sm text-center" readonly></div>
                 </div>
             </div>
 
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-lg shadow">Salvar Alterações</button>
-                <button type="submit" asp-page-handler="Excluir" id="btnExcluir" class="btn btn-link text-danger btn-sm text-decoration-none" onclick="return confirm('Deseja excluir permanentemente este registro?')">Excluir este Pantone</button>
+                <button type="submit" asp-page-handler="Excluir" id="btnExcluir" class="btn btn-link text-danger btn-sm text-decoration-none" onclick="return confirm('Excluir este Pantone?')">Excluir este Pantone</button>
             </div>
         </form>
     </div>
@@ -237,14 +236,10 @@
 
 @section Scripts {
     <script>
-        // Memória local para a Bancada (Favoritos)
         let favoritos = JSON.parse(localStorage.getItem('favoritosPantone')) || [];
 
-        // Ao carregar a página
         document.addEventListener('DOMContentLoaded', () => {
             atualizarContadorMenu();
-
-            // Lógica do Seletor de Cores
             const picker = document.getElementById('colorPicker');
             if(picker) {
                 picker.addEventListener('input', function() {
@@ -261,24 +256,19 @@
             return "#" + ((1 << 24) + (parseInt(r) << 16) + (parseInt(g) << 8) + parseInt(b)).toString(16).slice(1);
         }
 
-        // Funções da Bancada
         function adicionarAosFavoritos(cod, nome, co, pa, pes, r, g, b) {
-            if (favoritos.some(f => f.cod === cod)) {
-                alert("Este item já está na sua bancada!");
-                return;
-            }
+            if (favoritos.some(f => f.cod === cod)) return alert("Já está na bancada!");
             favoritos.push({ cod, nome, co, pa, pes, r, g, b });
             localStorage.setItem('favoritosPantone', JSON.stringify(favoritos));
             atualizarContadorMenu();
-            alert("Cor adicionada à Bancada!");
+            alert("Adicionado!");
         }
 
         function atualizarContadorMenu() {
-            const contador = document.getElementById('contadorMenu');
-            if(contador) contador.innerText = favoritos.length;
+            const c = document.getElementById('contadorMenu');
+            if(c) c.innerText = favoritos.length;
         }
 
-        // Funções do Formulário de Edição
         function preencherDetalhes(nome, cod, p, c, l, co, alt, pa, cv, pes, poli, r, g, b, ver, verpes) {
             document.getElementById('editNome').value = nome;
             document.getElementById('editCodigo').value = cod;
@@ -292,7 +282,6 @@
             document.getElementById('editCv').value = cv;
             document.getElementById('editPes').value = pes;
             document.getElementById('editPoli').value = poli;
-
             document.getElementById('editRed').value = r;
             document.getElementById('editGreen').value = g;
             document.getElementById('editBlue').value = b;
@@ -304,8 +293,8 @@
             document.getElementById('visualCor').style.backgroundColor = hex;
             document.getElementById('colorPicker').value = hex;
 
-            document.getElementById('btnExcluir').formAction = "/Index?handler=Excluir&id=" + cod;
-            document.getElementById('btnExcluir').style.display = "block";
+            const modal = new bootstrap.Offcanvas(document.getElementById('painelDetalhes'));
+            modal.show();
         }
 
         function limparForm() {
@@ -316,7 +305,6 @@
             document.getElementById('editVerificadapes').checked = false;
             document.getElementById('visualCor').style.backgroundColor = "#fff";
             document.getElementById('colorPicker').value = "#ffffff";
-            document.getElementById('btnExcluir').style.display = "none";
         }
     </script>
 }
